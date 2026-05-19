@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Survival Pack - Ultimate Logic Edition</title>
+    <title>My Survival Pack - Fixed Final Version</title>
     <style>
         :root {
             --primary-red: #d90429;
@@ -31,7 +31,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000;
         }
 
-        h1 { font-size: clamp(1.5rem, 6vw, 2.8rem); color: var(--primary-red); margin: 0; }
+        h1 { font-size: clamp(1.5rem, 6vw, 2.5rem); color: var(--primary-red); margin: 0; }
 
         #toast-notice { 
             position: fixed; top: -120px; left: 50%; transform: translateX(-50%); 
@@ -43,7 +43,7 @@
         #selection-guide {
             background: var(--accent-yellow); padding: 8px 15px; font-weight: bold;
             border-radius: 0 0 15px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            display: none; position: sticky; top: 60px; z-index: 999;
+            display: none; position: sticky; top: 60px; z-index: 999; text-align: center; width: 100%; max-width: 500px;
         }
 
         .main-container { display: flex; flex-direction: column; gap: 20px; width: 95vw; max-width: 1000px; padding: 20px 0; }
@@ -51,40 +51,41 @@
         .basket {
             background: white; border: 4px solid var(--dark-blue); border-radius: 20px;
             padding: 15px; min-height: 150px; box-shadow: 6px 6px 0px var(--dark-blue);
-            cursor: pointer; transition: 0.2s; margin-bottom: 10px;
+            cursor: pointer; transition: 0.2s; margin-bottom: 5px;
         }
 
         body.has-selection .basket:hover { background-color: #fff8e1; border-color: var(--accent-yellow); }
 
-        .basket-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 10px; border-bottom: 3px solid var(--primary-red); display: flex; justify-content: space-between; }
+        .basket-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 10px; border-bottom: 3px solid var(--primary-red); display: flex; justify-content: space-between; pointer-events: none;}
 
         .item-list { display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; pointer-events: none; }
 
         .word-bank-area {
             background: rgba(255, 255, 255, 0.8); border: 4px dashed #999; border-radius: 20px;
-            padding: 20px; height: 500px; overflow-y: auto; cursor: pointer;
+            padding: 20px; height: 450px; overflow-y: auto; cursor: pointer;
         }
 
         #word-bank { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; pointer-events: none; }
 
         .word-tag {
-            background: white; border: 2px solid var(--dark-blue); padding: 10px 18px;
-            border-radius: 50px; cursor: pointer; font-size: 1.3rem; font-weight: bold;
+            background: white; border: 2px solid var(--dark-blue); padding: 8px 16px;
+            border-radius: 50px; cursor: pointer; font-size: 1.2rem; font-weight: bold;
             box-shadow: 3px 3px 0px rgba(0,0,0,0.1); transition: 0.2s; pointer-events: auto;
         }
 
-        .word-tag.selected { background-color: var(--accent-yellow); border-color: var(--primary-red); transform: scale(1.1); }
+        .word-tag.selected { background-color: var(--accent-yellow); border-color: var(--primary-red); transform: scale(1.1); box-shadow: 0 0 15px gold; }
 
         .footer-actions { width: 100%; padding: 20px 0 60px 0; display: flex; justify-content: center; gap: 20px; }
-        .btn { padding: 15px 35px; font-size: 1.8rem; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; box-shadow: 0 6px 0px rgba(0,0,0,0.2); }
+        .btn { padding: 15px 35px; font-size: 1.5rem; font-weight: bold; border-radius: 50px; cursor: pointer; border: none; box-shadow: 0 6px 0px rgba(0,0,0,0.2); }
         #check-btn { background: var(--primary-red); color: white; }
         #reset-btn { background: #94a3b8; color: white; }
+        .btn:active { transform: translateY(3px); box-shadow: 0 3px 0px rgba(0,0,0,0.2); }
 
-        /* 彈窗優化 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; padding: 15px; }
-        .modal-content { background: white; width: 100%; max-width: 700px; padding: 30px; border-radius: 30px; text-align: center; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; width: 100%; max-width: 600px; padding: 30px; border-radius: 30px; text-align: center; max-height: 90vh; overflow-y: auto; }
         .easter-egg-box { background: #fff3b0; border: 2px dashed orange; padding: 15px; border-radius: 15px; margin: 10px 0; font-size: 1.1rem; color: #d9480f; font-weight: bold; }
-        .penalty-text { color: var(--primary-red); font-style: italic; margin-top: 5px; font-weight: bold; }
+        .penalty-text { color: var(--primary-red); font-style: italic; margin-top: 10px; font-weight: bold; font-size: 1rem; }
+        .opt-btn { width: 100%; margin: 5px 0; padding: 12px; border-radius: 10px; border: 2px solid var(--dark-blue); font-weight: bold; cursor: pointer; background: white; font-size: 1.1rem; }
     </style>
 </head>
 <body id="game-body">
@@ -96,6 +97,7 @@
     <div id="selection-guide">Selected: <span id="selected-word-name">None</span> (Click a bag to drop)</div>
 
     <div class="main-container">
+        <!-- 背包區 -->
         <div class="baskets-area">
             <div class="basket" onclick="handleTargetClick(this, 'list-1', 5)">
                 <div class="basket-title">1: the most important <span>MAX 5</span></div>
@@ -111,6 +113,7 @@
             </div>
         </div>
 
+        <!-- 字庫區 -->
         <div class="word-bank-area" onclick="handleTargetClick(this, 'word-bank', 999)">
             <div style="text-align:center; font-weight:bold; color:#888; margin-bottom:10px;">🏦 WORD BANK (Click to pick)</div>
             <div id="word-bank"></div>
@@ -118,6 +121,7 @@
     </div>
 
     <div class="footer-actions">
+        <!-- 確保 onclick 函式名稱正確 -->
         <button id="check-btn" class="btn" onclick="checkSurvival()">Check Survival</button>
         <button id="reset-btn" class="btn" onclick="resetGame()">Next Round (Reset)</button>
     </div>
@@ -126,15 +130,15 @@
     <div class="modal" id="result-modal">
         <div class="modal-content">
             <div id="extra-easter-eggs"></div>
-            <div id="miracle-label" style="display:none; font-weight:900; color:orange; font-size:2rem;">🍀 MIRACLE! 天選之子！</div>
-            <div id="scenario-label" style="font-size:1rem; color:#aaa; font-weight:bold;">SCENARIO</div>
-            <div id="result-icon" style="font-size:6rem;">✨</div>
-            <h2 id="result-title" style="font-size:3rem; margin:10px 0;">RESULT</h2>
-            <p id="result-desc" style="font-size:1.5rem; font-weight:bold; line-height:1.4;"></p>
+            <div id="miracle-label" style="display:none; font-weight:900; color:orange; font-size:1.8rem;">🍀 MIRACLE! 天選之子！</div>
+            <div id="scenario-label" style="font-size:0.9rem; color:#aaa; font-weight:bold;">SCENARIO</div>
+            <div id="result-icon" style="font-size:5rem;">✨</div>
+            <h2 id="result-title">RESULT</h2>
+            <p id="result-desc" style="font-size:1.3rem; font-weight:bold; line-height:1.4;"></p>
             <div id="penalty-area" class="penalty-text"></div>
             
             <div id="quiz-area" style="display:none; text-align:left; background:#f5f5f5; padding:20px; border-radius:20px; margin:15px 0;">
-                <p id="quiz-q" style="font-weight:bold; font-size:1.3rem;"></p>
+                <p id="quiz-q" style="font-weight:bold;"></p>
                 <div id="quiz-opts" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
 
@@ -155,15 +159,14 @@
         }
 
         const wordList = [
-            "medicine", "first-aid kit", "flashlight", "your phone", "power bank", "Apple watch", "laptop", "iPad mini", "lighter", "charger", "battery", "sunglasses",
-            "tissue paper", "towel", "mask", "glove", "t-shirt", "uniform", "lipstick", "perfume",
-            "water bottle", "ice", "mug", "bubble tea", "cola",
-            "canned food", "rice", "spaghetti", "cookie", "chocolate", "hamburger", "hot dog", "fish", "tofu", "movie ticket",
-            "shoes", "a pair of glasses", "clock", "basketball", "skateboard",
-            "Nintendo Switch", "PS5", "video game", "chiikawa", "plush toy", "manga", "novel", "your photo", "your homework",
-            "my dog", "whistle", "radio", "Wi-Fi router", "selfie stick", "headphone",
-            "sleeping bag", "coat", "pillow", "raincoat", "camp", "cap", "umbrella", "potted plant",
-            "a giant mirror", "a rock", "chair", "dumbbell", "sushi", "ice cream", "cash", "wallet", "coin", "id card", "key", "a gold bar", "designer bag", "your favorite teacher"
+            "medicine", "first-aid kit", "whistle", "canned food", "sleeping bag", "power bank", "Nintendo Switch", "flashlight", "your phone", 
+            "Apple watch", "laptop", "iPad mini", "lighter", "charger", "battery", "sunglasses", "tissue paper", "towel", "mask", "glove", 
+            "t-shirt", "uniform", "lipstick", "perfume", "water bottle", "ice", "mug", "bubble tea", "cola", "canned food", "rice", 
+            "spaghetti", "cookie", "chocolate", "hamburger", "hot dog", "fish", "tofu", "movie ticket", "shoes", "a pair of glasses", 
+            "clock", "basketball", "skateboard", "PS5", "video game", "chiikawa", "plush toy", "manga", "novel", "your photo", 
+            "your homework", "my dog", "radio", "Wi-Fi router", "selfie stick", "headphone", "coat", "pillow", "raincoat", "camp", 
+            "cap", "umbrella", "potted plant", "a giant mirror", "a rock", "chair", "dumbbell", "sushi", "ice cream", "cash", 
+            "wallet", "coin", "id card", "key", "a gold bar", "designer bag", "your favorite teacher"
         ];
 
         const quizBank = { 
@@ -182,7 +185,10 @@
 
         function init() {
             const wb = document.getElementById('word-bank');
-            wordList.sort(()=>Math.random()-0.5).forEach(word => {
+            wb.innerHTML = '';
+            // 過濾重複並隨機排序
+            const uniqueList = [...new Set(wordList)];
+            uniqueList.sort(()=>Math.random()-0.5).forEach(word => {
                 const tag = document.createElement('div');
                 tag.className = 'word-tag'; tag.textContent = word;
                 tag.onclick = (e) => {
@@ -202,118 +208,105 @@
             else { g.style.display = 'none'; document.getElementById('game-body').classList.remove('has-selection'); }
         }
 
-        function handleTargetClick(container, listId, max) {
+        // 核心移動邏輯
+        window.handleTargetClick = function(container, listId, max) {
             if(!selectedTag) return;
-            const list = document.getElementById(listId);
-            if(list.children.length >= max) { showToast("🚫 Bag is full!"); return; }
-            list.appendChild(selectedTag); playS('pop'); selectedTag.classList.remove('selected');
-            selectedTag = null; updateUI(false);
+            const list = (listId === 'word-bank') ? document.getElementById('word-bank') : container.querySelector('.item-list');
+            if(listId !== 'word-bank' && list.children.length >= max) { 
+                showToast("🚫 Bag is full!"); 
+                return; 
+            }
+            list.appendChild(selectedTag); 
+            playS('pop'); 
+            selectedTag.classList.remove('selected');
+            selectedTag = null; 
+            updateUI(false);
         }
 
-        function showToast(m) {
-            const t = document.getElementById('toast-notice'); t.textContent = m; t.style.top = '80px';
+        window.showToast = function(m) {
+            const t = document.getElementById('toast-notice'); 
+            t.textContent = m; 
+            t.style.top = '80px';
             setTimeout(() => t.style.top = '-120px', 2000);
         }
 
-        function checkSurvival() {
-            const items = Array.from(document.querySelectorAll('.basket .word-tag')).map(t => t.textContent);
-            if(items.length===0) { showToast("Bags are empty!"); return; }
+        // 結算邏輯
+        window.checkSurvival = function() {
+            const items = Array.from(document.querySelectorAll('.basket .word-tag')).map(t => t.textContent.trim());
+            if(items.length === 0) { showToast("Bags are empty! 🎒"); return; }
 
             const scens = ["A", "B", "C", "D", "E", "F", "G", "H"];
             const sId = scens[Math.floor(Math.random()*scens.length)];
             currentScenarioId = sId;
 
-            let win = false;
-            let desc = "";
-            let scenarioTitle = "";
-            let penaltyText = "";
-            let extraEggs = [];
+            let win = false; let desc = ""; let scenarioTitle = ""; let penaltyText = ""; let extraEggs = [];
 
-            // 基礎扣分判定
             const tooHeavy = ["a giant mirror", "a rock", "chair", "dumbbell"].some(i => items.includes(i));
             const spoiledFood = ["sushi", "ice cream"].some(i => items.includes(i));
 
-            // 情境邏輯
             switch(sId) {
-                case "A": // Power Outage
+                case "A":
                     scenarioTitle = "Power Outage (停電)";
-                    if(items.includes("flashlight")) { win=true; desc="The flashlight is perfect! You find the exit easily. 🔦🌟"; }
-                    else if(items.includes("your phone") && items.includes("power bank")) { win=true; desc="Your phone has full power! Use the flashlight and call for help! 📱🔋✨"; }
-                    else if(["Apple watch", "laptop", "iPad mini", "lighter"].some(i => items.includes(i))) { win=true; desc="The light is weak, but you barely made it! 🕯️"; }
-                    else if(["charger", "battery"].some(i => items.includes(i))) { win=false; desc="You have batteries/chargers, but nothing to plug them into! 🔋❌"; }
-                    else if(items.includes("sunglasses")) { win=false; desc="Why are you wearing sunglasses in the dark?! You crashed into a wall! 🕶️💀"; }
-                    else { win=false; desc="It's pitch black. You can't see anything... 🌑"; }
+                    if(items.includes("flashlight")) { win=true; desc="Perfect! Flashlight saved you. 🔦"; }
+                    else if(items.includes("your phone") && items.includes("power bank")) { win=true; desc="Phone + Power Bank combination! 📱🔋"; }
+                    else if(["Apple watch", "laptop", "iPad mini", "lighter"].some(i => items.includes(i))) { win=true; desc="Weak light, but you made it! 🕯️"; }
+                    else if(items.includes("sunglasses")) { win=false; desc="Sunglasses in the dark? You crashed! 🕶️💀"; }
+                    else { win=false; desc="It's too dark to move... 🌑"; }
                     break;
-                case "B": // Injured
-                    scenarioTitle = "Injured & Trapped (受傷)";
-                    if(["medicine", "first-aid kit"].some(i => items.includes(i))) { win=true; desc="You treated your wounds! Rescue is on the way. 🎉🩹"; }
-                    else if(["tissue paper", "towel", "mask", "glove", "t-shirt", "uniform", "lipstick"].some(i => items.includes(i))) { 
-                        win=true; desc="You managed to stop the bleeding with your supplies! Barely survived. 🩸🩹"; 
-                        if(items.includes("lipstick")) desc += " (You used lipstick to write SOS!)";
-                    }
-                    else if(items.includes("perfume")) { win=false; desc="Perfume cannot heal your wound! It just hurts! 😭"; }
-                    else { win=false; desc="You are bleeding and have nothing to stop it... 💀"; }
+                case "B":
+                    scenarioTitle = "Injured (受傷)";
+                    if(["medicine", "first-aid kit"].some(i => items.includes(i))) { win=true; desc="Treated wounds successfully! 🩹"; }
+                    else if(["tissue paper", "towel", "mask", "glove", "t-shirt", "uniform", "lipstick"].some(i => items.includes(i))) { win=true; desc="Improvised bandage saved you! 🩸"; }
+                    else { win=false; desc="No medical supplies... 💀"; }
                     break;
-                case "C": // Thirsty
+                case "C":
                     scenarioTitle = "Thirsty (缺水)";
-                    if(items.includes("water bottle")) { win=true; desc="Fresh water! You stay hydrated. 💧🎉"; }
-                    else if(["ice", "mug"].some(i => items.includes(i))) { win=true; desc="You used the mug to catch rain/melted ice. Barely survived! ⛈️"; }
-                    else if(["bubble tea", "cola"].some(i => items.includes(i))) { win=false; desc="They make you even more thirsty! Sugar is your enemy now! 🥤🤢"; }
-                    else { win=false; desc="No water... the thirst is unbearable. 🏜️"; }
+                    if(items.includes("water bottle")) { win=true; desc="Fresh water! Hydration is key. 💧"; }
+                    else if(["ice", "mug"].some(i => items.includes(i))) { win=true; desc="Caught rain or melted ice! ⛈️"; }
+                    else if(["bubble tea", "cola"].some(i => items.includes(i))) { win=false; desc="Sugar made you even more thirsty! 🥤🤢"; }
+                    else { win=false; desc="Dehydration... 🏜️"; }
                     break;
-                case "D": // Hunger
-                    scenarioTitle = "Hunger Crisis (飢餓)";
-                    if(["canned food", "rice", "spaghetti", "cookie", "chocolate"].some(i => items.includes(i))) { win=true; desc="Delicious! You have plenty of energy. 🍫🍱"; }
-                    else if(["hamburger", "hot dog", "fish", "tofu"].some(i => items.includes(i))) { win=true; desc="The food was almost spoiled, but it saved your life! 🍔🤢"; }
-                    else if(items.includes("movie ticket")) { win=false; desc="You can't eat a movie ticket! 🎫💀"; }
-                    else { win=false; desc="You are starving... no energy to move. 💀"; }
+                case "D":
+                    scenarioTitle = "Hunger (飢餓)";
+                    if(["canned food", "rice", "spaghetti", "cookie", "chocolate"].some(i => items.includes(i))) { win=true; desc="Yummy! Plenty of energy. 🍫"; }
+                    else if(["hamburger", "hot dog", "fish", "tofu"].some(i => items.includes(i))) { win=true; desc="Food was almost bad, but it worked! 🍔"; }
+                    else { win=false; desc="Starving... 💀"; }
                     break;
-                case "E": // Escape
-                    scenarioTitle = "Escape in the Dark (混亂逃生)";
-                    if(items.includes("shoes")) { win=true; desc="You ran fast and safely! 🏃‍♂️💨"; }
-                    else if(["a pair of glasses", "clock"].some(i => items.includes(i))) { win=true; desc="You stayed calm and saw the path. Barely survived! 🤓⏳"; }
-                    else if(["basketball", "skateboard"].some(i => items.includes(i))) { win=false; desc="You tripped over your basketball/skateboard while running! 🏀❌"; }
-                    else { win=false; desc="You tripped and fell in the dark... 💀"; }
+                case "E":
+                    scenarioTitle = "Escape (逃生)";
+                    if(items.includes("shoes")) { win=true; desc="You ran fast and safely! 🏃‍♂️"; }
+                    else if(["basketball", "skateboard"].some(i => items.includes(i))) { win=false; desc="Tripped over your sports gear! 🏀❌"; }
+                    else { win=false; desc="You fell in the chaos... 💀"; }
                     break;
-                case "F": // Panic
-                    scenarioTitle = "Panic Attack (恐慌)";
-                    if(["Nintendo Switch", "PS5", "video game", "chiikawa", "plush toy", "manga", "novel", "your photo"].some(i => items.includes(i))) { win=true; desc="Your hobbies keep you calm and happy! 🎮📖🎉"; }
-                    else if(items.includes("your homework")) { win=false; desc="Looking at your homework makes you even MORE stressed! 📝😱"; }
-                    else { win=false; desc="The panic is overwhelming... 😭"; }
+                case "F":
+                    scenarioTitle = "Panic (恐慌)";
+                    if(["Nintendo Switch", "PS5", "video game", "chiikawa", "plush toy", "manga", "novel", "your photo"].some(i => items.includes(i))) { win=true; desc="Hobbies kept you calm! 🎮"; }
+                    else if(items.includes("your homework")) { win=false; desc="Homework stress killed the vibe! 📝😱"; }
+                    else { win=false; desc="Panic attack... 😭"; }
                     break;
-                case "G": // Rescue
-                    scenarioTitle = "Family Rescue (救援)";
-                    if(["my dog", "whistle", "radio"].some(i => items.includes(i))) { win=true; desc="Rescuers heard you! You are saved! 🐶📣"; }
-                    else if(items.includes("your phone") && items.includes("Wi-Fi router")) { win=true; desc="You sent a message via Wi-Fi! Modern rescue! 📱📡"; }
-                    else if(items.includes("selfie stick")) { win=false; desc="You tried to take a selfie with the ruins? Nobody came to save you... 🤳❌"; }
-                    else if(items.includes("headphone")) { win=false; desc="You were listening to music and didn't hear the rescue team! 🎧🤫"; }
-                    else { win=false; desc="It's too quiet. No one knows where you are... 🤫"; }
+                case "G":
+                    scenarioTitle = "Rescue (救援)";
+                    if(["my dog", "whistle", "radio"].some(i => items.includes(i))) { win=true; desc="Rescuers heard you! 🐶📣"; }
+                    else if(items.includes("selfie stick")) { win=false; desc="Taking selfies? No one came. 🤳❌"; }
+                    else { win=false; desc="They couldn't find you... 🤫"; }
                     break;
-                case "H": // Cold Wave
+                case "H":
                     scenarioTitle = "Cold Wave (寒流)";
-                    if(["sleeping bag", "coat", "pillow"].some(i => items.includes(i))) { win=true; desc="The sleeping bag keeps you super warm and cozy! 🛌🌟"; }
-                    else if(["raincoat", "camp", "glove", "t-shirt", "uniform", "cap", "umbrella"].some(i => items.includes(i))) { win=true; desc="You don't have a sleeping bag, but you put on everything to stay alive! 🥶🧥"; }
-                    else if(items.includes("potted plant")) { win=false; desc="The plant froze to death, and so did you! 🥶🪴"; }
-                    else { win=false; desc="It's freezing! You are shivering in the dark... ❌❄️"; }
+                    if(["sleeping bag", "coat", "pillow"].some(i => items.includes(i))) { win=true; desc="Warm and cozy! 🛌"; }
+                    else if(["raincoat", "camp", "glove", "t-shirt", "cap"].some(i => items.includes(i))) { win=true; desc="Layering saved you! 🥶Coat"; }
+                    else { win=false; desc="Frozen solid... ❌❄️"; }
                     break;
             }
 
-            // 結算額外補刀
             if(!win) {
-                if(tooHeavy) penaltyText += "And your backpack is too heavy to run! 🥵 ";
-                if(spoiledFood) penaltyText += "You ate spoiled food and got a stomachache! 🤢";
+                if(tooHeavy) penaltyText += "Too heavy to run! 🥵 ";
+                if(spoiledFood) penaltyText += "Ate spoiled food! 🤢";
             }
 
-            // 特定身分彩蛋
-            const richItems = ["cash", "wallet", "coin", "id card", "key", "a gold bar", "designer bag"];
-            if(richItems.every(ri => items.includes(ri))) {
-                extraEggs.push("You are rich in the shelter! But remember, money can't buy water here! 💰");
-            }
-            if(items.includes("your favorite teacher")) {
-                extraEggs.push("Your favorite teacher is in your backpack! Teacher says: 'Don't forget to practice English even in an earthquake!' 🧑‍🏫");
-            }
+            const richItems = ["cash", "wallet", "coin", "id card", "key", "a gold bar"];
+            if(richItems.every(ri => items.includes(ri))) extraEggs.push("Rich in the shelter! But money can't buy water here! 💰");
+            if(items.includes("your favorite teacher")) extraEggs.push("Teacher says: 'Keep practicing English!' 🧑‍🏫");
 
-            // 更新介面
             const mb = document.getElementById('result-modal');
             document.getElementById('modal-box').className = 'modal-content ' + (win?'result-success':'result-fail');
             document.getElementById('scenario-label').textContent = "SCENARIO: " + scenarioTitle;
@@ -335,7 +328,7 @@
             playS(win?'win':'fail');
         }
 
-        function showReviveQuiz() {
+        window.showReviveQuiz = function() {
             document.getElementById('revive-btn').style.display = 'none';
             document.getElementById('quiz-area').style.display = 'block';
             const q = quizBank[currentScenarioId];
@@ -343,7 +336,6 @@
             const opts = document.getElementById('quiz-opts'); opts.innerHTML = '';
             q.o.forEach((o, i) => {
                 const b = document.createElement('button'); b.className = 'opt-btn'; b.textContent = o;
-                b.style.padding = "10px"; b.style.borderRadius = "10px"; b.style.fontWeight = "bold";
                 b.onclick = () => {
                     if(i === q.c) { closeModal(); showToast("REVIVED! 🎉"); playS('win'); }
                     else { b.style.background = 'red'; b.style.color='white'; b.disabled = true; }
@@ -352,10 +344,16 @@
             });
         }
 
-        function closeModal() { document.getElementById('result-modal').style.display='none'; }
-        function resetGame() {
-            document.querySelectorAll('.basket .word-tag').forEach(t => document.getElementById('word-bank').appendChild(t));
-            selectedTag = null; updateUI(false);
+        window.closeModal = function() { document.getElementById('result-modal').style.display='none'; }
+        
+        window.resetGame = function() {
+            const tags = document.querySelectorAll('.basket .word-tag');
+            const bank = document.getElementById('word-bank');
+            tags.forEach(t => bank.appendChild(t));
+            if(selectedTag) selectedTag.classList.remove('selected');
+            selectedTag = null; 
+            updateUI(false);
+            playS('pop');
         }
 
         init();
