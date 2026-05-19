@@ -2,8 +2,8 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Survival Pack - Lucky Survivor Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Survival Pack - Click-to-Place Edition</title>
     <style>
         :root {
             --primary-red: #d90429;
@@ -12,339 +12,393 @@
             --success-bg: #e7f5ff;
             --dark-blue: #2b2d42;
             --light-gray: #edf2f4;
-            --tag-font-size: 1.5rem;
+            --accent-yellow: #ffbe0b;
         }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'Comic Sans MS', 'Chalkboard SE', 'Segoe UI', sans-serif;
             background-color: var(--light-gray);
             color: var(--dark-blue);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            height: 50px;
+            display: flex;
             align-items: center;
-            min-height: 100vh;
-            overflow: hidden; /* 防止撒花溢出 */
+            justify-content: center;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
         }
 
-        header { text-align: center; margin-bottom: 20px; }
-        h1 { font-size: 3.2rem; color: var(--primary-red); margin: 0; text-shadow: 2px 2px 0px white; }
+        h1 { font-size: clamp(1.2rem, 4vw, 2.2rem); color: var(--primary-red); margin: 0; }
 
-        /* 頂部大提示 */
-        #toast-notice {
-            position: fixed;
-            top: -120px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary-red);
-            color: white;
-            padding: 25px 70px;
-            border-radius: 60px;
-            font-size: 2.5rem;
-            font-weight: bold;
-            z-index: 7000;
-            transition: top 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        /* 主容器佈局 */
+        .main-container {
+            display: flex;
+            flex-direction: row; /* 平板與電腦左右排 */
+            gap: 15px;
+            padding: 10px;
+            flex-grow: 1;
+            min-height: 0;
         }
 
-        /* 主畫面佈局 */
-        .main-layout { display: flex; gap: 20px; width: 98vw; max-width: 1750px; margin-bottom: 10px; z-index: 10; }
-        .baskets-area { flex: 1.1; display: flex; flex-direction: column; gap: 10px; }
-        .basket { background: white; border: 5px solid var(--dark-blue); border-radius: 20px; padding: 15px 20px; min-height: 170px; box-shadow: 8px 8px 0px var(--dark-blue); display: flex; flex-direction: column; }
-        .basket.drag-over { background: #fff0f0; transform: scale(1.02); border-style: dashed; }
-        .basket-title { font-size: 1.6rem; font-weight: 900; margin-bottom: 10px; border-bottom: 3px solid var(--primary-red); display: flex; justify-content: space-between; align-items: center; }
-        .item-list { flex-grow: 1; display: flex; flex-wrap: wrap; gap: 10px; align-content: flex-start; }
+        /* 籃子區 */
+        .baskets-area {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 0;
+        }
+
+        .basket {
+            background: white;
+            border: 3px solid var(--dark-blue);
+            border-radius: 15px;
+            padding: 8px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px var(--dark-blue);
+            position: relative;
+        }
+
+        /* 當有單字被選中時，籃子呈現可點擊狀態 */
+        body.has-selection .basket:hover {
+            border-color: var(--primary-red);
+            background: #fff8f8;
+            transform: translateY(-2px);
+        }
+
+        .basket-title {
+            font-size: 1rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+            border-bottom: 2px solid var(--primary-red);
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+        }
+
+        .item-list {
+            flex-grow: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-content: flex-start;
+            overflow-y: auto;
+            pointer-events: none; /* 點擊由父層 basket 統一處理 */
+        }
 
         /* 字庫區 */
-        .word-bank-area { flex: 1; background: rgba(255, 255, 255, 0.8); border: 4px dashed #999; border-radius: 20px; padding: 15px; height: 600px; overflow-y: auto; }
-        #word-bank { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        .word-tag { background: white; border: 2px solid var(--dark-blue); padding: 10px 18px; border-radius: 50px; cursor: grab; font-size: var(--tag-font-size); font-weight: bold; box-shadow: 3px 3px 0px rgba(0,0,0,0.1); transition: 0.2s; }
-        .word-tag:hover { transform: scale(1.08); background: #fdfdfd; }
+        .word-bank-area {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.7);
+            border: 3px dashed #bbb;
+            border-radius: 15px;
+            padding: 10px;
+            overflow-y: auto;
+            cursor: pointer;
+        }
 
-        /* 按鈕區 */
-        .actions-footer { width: 100%; display: flex; justify-content: center; gap: 30px; padding: 10px 0 30px 0; z-index: 10; }
-        .btn { padding: 18px 50px; font-size: 2rem; font-weight: bold; border-radius: 60px; cursor: pointer; border: none; box-shadow: 0 8px 0px rgba(0,0,0,0.2); transition: 0.2s; }
+        #word-bank {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        /* 單字標籤 */
+        .word-tag {
+            background: white;
+            border: 2px solid var(--dark-blue);
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            user-select: none;
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            font-weight: bold;
+            box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+            pointer-events: auto; /* 確保單字本身可被點擊選取 */
+        }
+
+        /* 選中效果 */
+        .word-tag.selected {
+            background-color: var(--accent-yellow);
+            border-color: var(--primary-red);
+            box-shadow: 0 0 15px var(--accent-yellow);
+            transform: scale(1.1);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.7; }
+        }
+
+        /* 底部按鈕 */
+        .footer-actions {
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            border-top: 1px solid #ddd;
+            padding: 0 10px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 0px rgba(0,0,0,0.2);
+            transition: 0.1s;
+        }
+
         #check-btn { background: var(--primary-red); color: white; }
         #reset-btn { background: #94a3b8; color: white; }
+        .btn:active { transform: translateY(2px); box-shadow: 0 2px 0px rgba(0,0,0,0.2); }
 
-        /* 結局大彈窗 */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 5000; justify-content: center; align-items: center; }
-        .modal-content { width: 85%; max-width: 1000px; padding: 45px; border-radius: 50px; text-align: center; position: relative; border: 15px solid white; transition: 0.3s; }
-        .result-success { background-color: var(--success-bg); border-color: var(--success-green); }
-        .result-fail { background-color: var(--fail-bg); border-color: var(--primary-red); }
-
-        /* 天選之子特效標題 */
-        #miracle-title {
-            display: none;
-            font-size: 2.8rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: rainbow-bg 2s linear infinite, glow 1s ease-in-out infinite alternate;
-            margin-bottom: 20px;
+        /* 手機 RWD 切換上下排列 */
+        @media (max-width: 768px) {
+            .main-container { flex-direction: column; }
+            .baskets-area { flex: 1.6; }
+            .word-bank-area { flex: 1; }
         }
-        @keyframes rainbow-bg { to { background-position: 200% center; } }
-        @keyframes glow { from { text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #e60073; } to { text-shadow: 0 0 20px #fff, 0 0 30px #ff4da6, 0 0 40px #ff4da6; } }
 
-        .result-icon { font-size: 8rem; margin-bottom: 5px; }
-        .result-title { font-size: 4rem; margin: 5px 0; font-weight: 900; }
-        .result-desc { font-size: 2.2rem; line-height: 1.3; font-weight: bold; }
-
-        /* 碎紙特效容器 */
-        #confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 6000; display: none; }
-        .confetti { position: absolute; width: 15px; height: 15px; animation: fall linear forwards; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
-
-        /* 挽救機制 */
-        #revive-btn { background: linear-gradient(45deg, #ff9f43, #ff6b6b); color: white; padding: 20px 40px; font-size: 1.8rem; animation: pulse 1.5s infinite; display: none; margin: 15px auto; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-        #quiz-container { display: none; margin-top: 15px; }
-        .quiz-question { font-size: 2rem; font-weight: bold; margin-bottom: 20px; color: #1d3557; background: white; padding: 15px; border-radius: 15px; }
-        .quiz-options { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-        .opt-btn { width: 85%; padding: 12px; font-size: 1.6rem; border-radius: 12px; border: 2px solid var(--dark-blue); background: white; cursor: pointer; font-weight: bold; }
-        .correct-ans { background-color: var(--success-green) !important; color: white !important; }
-        .wrong-ans { background-color: var(--primary-red) !important; color: white !important; }
+        /* 彈窗設計 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: white; width: 100%; max-width: 500px; padding: 30px; border-radius: 30px; text-align: center; position: relative; }
+        #miracle-title { font-size: 1.8rem; font-weight: 900; color: #ff9f43; text-shadow: 0 0 10px gold; margin-bottom: 10px; display: none; }
+        
+        #toast-notice { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: var(--primary-red); color: white; padding: 10px 30px; border-radius: 30px; z-index: 11000; transition: 0.4s; font-weight: bold; }
+        #confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
     </style>
 </head>
-<body>
+<body id="game-body">
 
-    <div id="toast-notice">Bag is full! 🎒</div>
+    <div id="toast-notice">Bag full! 🎒</div>
     <div id="confetti-container"></div>
 
     <header><h1>🎒 My Survival Pack</h1></header>
 
-    <div class="main-layout">
+    <div class="main-container">
+        <!-- 籃子區 -->
         <div class="baskets-area">
-            <div class="basket" id="basket-1" data-max="5">
-                <div class="basket-title">1: the most important <span class="capacity-info">MAX 5</span></div>
+            <div class="basket" id="basket-1" onclick="moveSelected(this)">
+                <div class="basket-title">1: the most important <span style="color:var(--primary-red)">MAX 5</span></div>
                 <div class="item-list" id="list-1"></div>
             </div>
-            <div class="basket" id="basket-2" data-max="5">
-                <div class="basket-title">2: It can save me <span class="capacity-info">MAX 5</span></div>
+            <div class="basket" id="basket-2" onclick="moveSelected(this)">
+                <div class="basket-title">2: It can save me <span style="color:var(--primary-red)">MAX 5</span></div>
                 <div class="item-list" id="list-2"></div>
             </div>
-            <div class="basket" id="basket-3" data-max="5">
-                <div class="basket-title">3: It's OK to have it <span class="capacity-info">MAX 5</span></div>
+            <div class="basket" id="basket-3" onclick="moveSelected(this)">
+                <div class="basket-title">3: It's OK to have it <span style="color:var(--primary-red)">MAX 5</span></div>
                 <div class="item-list" id="list-3"></div>
             </div>
         </div>
 
-        <div class="word-bank-area">
+        <!-- 字庫區 -->
+        <div class="word-bank-area" id="word-bank-container" onclick="moveSelected(this)">
             <div id="word-bank"></div>
         </div>
     </div>
 
-    <div class="actions-footer">
-        <button id="check-btn" class="btn">Check Survival Rate</button>
-        <button id="reset-btn" class="btn">Next Round (Reset)</button>
+    <!-- 底部按鈕區 -->
+    <div class="footer-actions">
+        <button id="check-btn" class="btn" onclick="checkSurvival()">Check Survival Rate</button>
+        <button id="reset-btn" class="btn" onclick="resetGame()">Next Round (Reset)</button>
     </div>
 
+    <!-- 彈窗系統 -->
     <div class="modal" id="result-modal">
-        <div class="modal-content" id="modal-box">
+        <div class="modal-content">
             <div id="miracle-title">🍀 MIRACLE! 天選之子大逆轉！</div>
-            <div id="scenario-label" style="font-size: 1.4rem; font-weight: 900; color: #555;">SCENARIO</div>
-            <div class="result-icon" id="result-icon">✨</div>
-            <h2 class="result-title" id="result-title">SUCCESS</h2>
-            <p class="result-desc" id="result-desc"></p>
+            <div id="scenario-label" style="font-weight: bold; color: #888;">SCENARIO</div>
+            <div id="result-icon" style="font-size: 5rem;">✨</div>
+            <h2 id="result-title">SUCCESS</h2>
+            <p id="result-desc" style="font-size: 1.2rem; font-weight: bold;"></p>
             
-            <button id="revive-btn" class="btn" onclick="startQuiz()">🔥 Last Chance to Revive (英文挽救機會)</button>
-
-            <div id="quiz-container">
-                <div class="quiz-question" id="quiz-q">Question?</div>
-                <div class="quiz-options">
-                    <button class="opt-btn" onclick="checkAnswer(0)" id="opt0">A</button>
-                    <button class="opt-btn" onclick="checkAnswer(1)" id="opt1">B</button>
-                    <button class="opt-btn" onclick="checkAnswer(2)" id="opt2">C</button>
-                </div>
+            <div id="quiz-area" style="display:none; text-align: left; background: #f0f0f0; padding: 15px; border-radius: 15px; margin-top: 10px;">
+                <p id="quiz-q" style="font-weight: bold;"></p>
+                <div id="quiz-opts"></div>
             </div>
 
-            <button id="close-modal-btn" class="btn" style="margin-top:20px; background: var(--dark-blue); color:white; font-size: 1.4rem;" onclick="closeModal()">Close</button>
+            <button id="revive-btn" class="btn" style="display:none; background: orange; color:white; margin: 10px 0; width: 100%;" onclick="startRevive()">🔥 Last Chance Revive</button>
+            <button class="btn" style="background: var(--dark-blue); color:white; width: 100%; margin-top: 10px;" onclick="closeModal()">Close</button>
         </div>
     </div>
 
     <script>
+        // 音效
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-            if (type === 'drop') { osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(10, now + 0.1); gain.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now + 0.1); }
-            else if (type === 'error') { osc.type = 'sawtooth'; osc.frequency.setValueAtTime(120, now); gain.gain.setValueAtTime(0.2, now); osc.start(); osc.stop(now + 0.3); }
-            else if (type === 'win') { [523, 783, 1046].forEach((f, i) => { const o = audioCtx.createOscillator(); o.connect(audioCtx.destination); o.frequency.setValueAtTime(f, now + i*0.1); o.start(now + i*0.1); o.stop(now + i*0.1 + 0.4); }); }
-            else if (type === 'fail') { osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(50, now + 0.6); gain.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now + 0.6); }
+        function playS(t){
+            if(audioCtx.state==='suspended')audioCtx.resume();
+            const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+            o.connect(g); g.connect(audioCtx.destination);
+            if(t==='click'){o.frequency.setValueAtTime(800,0); o.frequency.exponentialRampToValueAtTime(400,0.1); g.gain.setValueAtTime(0.05,0); o.start(); o.stop(0.1);}
+            if(t==='pop'){o.frequency.setValueAtTime(400,0); o.frequency.exponentialRampToValueAtTime(900,0.1); g.gain.setValueAtTime(0.1,0); o.start(); o.stop(0.1);}
+            if(t==='error'){o.type='sawtooth'; o.frequency.setValueAtTime(120,0); g.gain.setValueAtTime(0.1,0); o.start(); o.stop(0.2);}
         }
 
-        // --- Confetti 特效 ---
-        function spawnConfetti() {
-            const container = document.getElementById('confetti-container');
-            container.style.display = 'block';
-            container.innerHTML = '';
-            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
-            const icons = ['🌸', '✨', '🎉', '🌟', '🍀'];
-            for (let i = 0; i < 100; i++) {
-                const conf = document.createElement('div');
-                conf.className = 'confetti';
-                if (Math.random() > 0.3) {
-                    conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                } else {
-                    conf.textContent = icons[Math.floor(Math.random() * icons.length)];
-                    conf.style.fontSize = '20px';
-                }
-                conf.style.left = Math.random() * 100 + 'vw';
-                conf.style.top = '-20px';
-                conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                conf.style.animationDelay = (Math.random() * 2) + 's';
-                container.appendChild(conf);
-            }
-        }
+        const wordList = ["medicine","whistle", "canned food", "first-aid kit", "sleeping bag", "power bank", "Nintendo Switch", "selfie stick", "gold bar", "perfume", "bubble tea", "sushi", "mirror", "skateboard", "potted plant", "tissue paper", "raincoat", "flashlight", "headphone", "charger", "radio", "mask", "Apple watch", "tofu", "glove", "coat", "your phone", "hamburger", "movie ticket", "glasses", "WI-FI", "ice", "my dog", "cash", "basketball", "water bottle", "coin", "cola", "chiikawa", "towel", "key", "shoes", "iPad mini", "battery", "sunglasses", "cap", "poker", "wallet", "camp", "pillow", "a rock", "your photo", "chocolate", "cookie", "fish", "ice cream", "uniform", "lighter", "mug", "spaghetti", "teacher", "clock", "PS5", "chair", "t-shirt", "manga", "id card", "umbrella", "novel", "laptop", "video game", "homework", "lipstick", "hot dog"];
+        const quizBank = { 'A':{q:"Dark! Which tool emits light?", o:["headphone","flashlight","battery"], c:1}, 'B':{q:"Bleeding! What to treat wound?", o:["medicine","chocolate","tissue paper"], c:0}, 'C':{q:"Stores clean water?", o:["water bottle","mug","cola"], c:0}, 'D':{q:"Heavy rain! Wear a _______.", o:["t-shirt","coat","raincoat"], c:2}, 'E':{q:"Hungry! Energy food?", o:["spaghetti","ice","rock"], c:0}, 'F':{q:"Smoke! Wear a ______.", o:["cap","mask","sunglasses"], c:1}, 'G':{q:"Anxious! Comfort item?", o:["PS5","cash","plush toy"], c:2}, 'H':{q:"Bark to help rescuers?", o:["my dog","teacher","id card"], c:0}};
 
-        const baseWords = ["tissue paper", "raincoat", "flashlight", "headphone", "charger", "radio", "mask", "Apple watch", "tofu", "glove", "coat", "your phone", "hamburger", "movie ticket", "a pair of glasses", "WI-FI", "ice", "my dog", "cash", "basketball", "water bottle", "coin", "cola", "chiikawa", "towel", "key", "shoes", "iPad mini", "battery", "sunglasses", "cap", "poker", "wallet", "camp", "pillow", "a rock", "your photo", "chocolate", "cookie", "fish", "ice cream", "uniform", "lighter", "mug", "spaghetti", "your favorite teacher", "clock", "PS5", "chair", "t-shirt", "manga", "id card", "umbrella", "novel", "laptop", "video game", "your homework", "lipstick", "hot dog", "medicine", "plush toy"];
-        const newWords = ["whistle", "canned food", "first-aid kit", "sleeping bag", "power bank", "Nintendo Switch", "selfie stick", "a gold bar", "perfume", "bubble tea", "sushi", "a giant mirror", "skateboard", "a potted plant"];
-        const wordList = [...baseWords, ...newWords];
+        let selectedTag = null;
+        let currentScenarioId = 'A';
 
-        const quizBank = {
-            'A': { q: "It's dark. Which tool can emit light?", options: ["headphone", "flashlight", "battery"], correct: 1 },
-            'B': { q: "Your arm is bleeding. What do you need?", options: ["medicine", "chocolate", "tissue paper"], correct: 0 },
-            'C': { q: "Which item stores clean water?", options: ["water bottle", "mug", "cola"], correct: 0 },
-            'D': { q: "Wear a waterproof _______ in heavy rain.", options: ["t-shirt", "coat", "raincoat"], correct: 2 },
-            'E': { q: "Need carbohydrates to recharge. Eat _______.", options: ["spaghetti", "ice", "a rock"], correct: 0 },
-            'F': { q: "Protect your lungs from smoke with a ______.", options: ["cap", "mask", "sunglasses"], correct: 1 },
-            'G': { q: "What provides emotional comfort?", options: ["PS5", "cash", "plush toy"], correct: 2 },
-            'H': { q: "Who can bark to help rescuers find you?", options: ["my dog", "your favorite teacher", "id card"], correct: 0 }
-        };
-
-        let currentScenarioId = 'A'; let draggedItem = null;
-
+        // 初始化
         function init() {
-            const wb = document.getElementById('word-bank'); wb.innerHTML = '';
-            wordList.sort(() => Math.random() - 0.5);
-            wordList.forEach(w => {
-                const tag = document.createElement('div'); tag.className = 'word-tag'; tag.textContent = w; tag.draggable = true;
-                tag.addEventListener('dragstart', function() { draggedItem = this; this.style.opacity = '0.3'; });
-                tag.addEventListener('dragend', function() { this.style.opacity = '1'; });
+            const wb = document.getElementById('word-bank');
+            wordList.sort(()=>Math.random()-0.5).forEach(word => {
+                const tag = document.createElement('div');
+                tag.className = 'word-tag';
+                tag.textContent = word;
+                tag.onclick = (e) => {
+                    e.stopPropagation();
+                    selectTag(tag);
+                };
                 wb.appendChild(tag);
             });
         }
 
-        document.querySelectorAll('.item-list, #word-bank').forEach(zone => {
-            zone.addEventListener('dragover', e => e.preventDefault());
-            zone.addEventListener('drop', function(e) {
-                e.preventDefault();
-                const basket = this.closest('.basket');
-                if (basket && this.children.length >= 5) {
-                    const toast = document.getElementById('toast-notice'); toast.style.top = '60px'; playSound('error');
-                    setTimeout(() => toast.style.top = '-150px', 2000); return;
-                }
-                this.appendChild(draggedItem); playSound('drop');
-            });
-        });
+        // 點擊選擇單字
+        function selectTag(tag) {
+            playS('click');
+            if (selectedTag) selectedTag.classList.remove('selected');
+            
+            if (selectedTag === tag) {
+                selectedTag = null;
+                document.getElementById('game-body').classList.remove('has-selection');
+            } else {
+                selectedTag = tag;
+                selectedTag.classList.add('selected');
+                document.getElementById('game-body').classList.add('has-selection');
+            }
+        }
 
-        document.getElementById('check-btn').addEventListener('click', () => {
+        // 點擊籃子或字庫移動單字
+        function moveSelected(container) {
+            if (!selectedTag) return;
+
+            const list = container.classList.contains('word-bank-area') ? 
+                         document.getElementById('word-bank') : 
+                         container.querySelector('.item-list');
+
+            // 容量檢查
+            if (!container.classList.contains('word-bank-area') && list.children.length >= 5) {
+                showT("🚫 Bag Full!");
+                playS('error');
+                return;
+            }
+
+            list.appendChild(selectedTag);
+            playS('pop');
+            selectedTag.classList.remove('selected');
+            selectedTag = null;
+            document.getElementById('game-body').classList.remove('has-selection');
+        }
+
+        function showT(m){ 
+            const t=document.getElementById('toast-notice'); 
+            t.textContent=m; t.style.top='20px'; 
+            setTimeout(()=>t.style.top='-100px',2000); 
+        }
+
+        function checkSurvival() {
             const items = Array.from(document.querySelectorAll('.basket .word-tag')).map(t => t.textContent);
-            if (items.length === 0) return;
+            if(items.length===0) { showT("Bag is empty!"); return; }
 
-            const scenarios = [
-                { id: 'A', title: "POWER OUTAGE (停電)", need: ['flashlight', 'Apple watch', 'power bank', 'your phone'], ok: "You have light! You survive! 💡", fail: "It's too dark!" },
-                { id: 'B', title: "INJURED (受傷)", need: ['medicine', 'tissue paper', 'first-aid kit'], ok: "You treated the wound! 🎉", fail: "No medical supplies!" },
-                { id: 'C', title: "THIRSTY (缺水)", need: ['water bottle', 'cola'], ok: "Refreshing! You have water! 💧", fail: "No water!" },
-                { id: 'D', title: "COLD WAVE (寒流)", need: ['coat', 'raincoat', 'sleeping bag'], ok: "You stay warm! 🔥", fail: "Too cold!" },
-                { id: 'E', title: "HUNGRY (飢餓)", need: ['cookie', 'spaghetti', 'hamburger', 'canned food'], ok: "Yummy! You have energy! 🍫", fail: "No food!" },
-                { id: 'F', title: "ESCAPE (逃生)", need: ['mask', 'shoes'], ok: "You escaped safely! 🏃‍♂️", fail: "Cut by glass!" },
-                { id: 'G', title: "PANIC (孤獨)", need: ['plush toy', 'chiikawa', 'your photo', 'Nintendo Switch'], ok: "You are calm! 🥰", fail: "Too lonely!" },
-                { id: 'H', title: "RESCUE (救援)", need: ['my dog', 'radio', 'your phone', 'whistle'], ok: "Found by rescuers! 🐶", fail: "Nobody knows!" }
+            const scens = [
+                {id:'A',t:"POWER OUTAGE", n:['flashlight','power bank','your phone']},
+                {id:'B',t:"INJURED", n:['medicine','first-aid kit']},
+                {id:'C',t:"THIRSTY", n:['water bottle','cola']},
+                {id:'D',t:"COLD WAVE", n:['coat','raincoat','sleeping bag']},
+                {id:'E',t:"HUNGRY", n:['cookie','hamburger','canned food']},
+                {id:'F',t:"ESCAPE", n:['mask','shoes']},
+                {id:'G',t:"PANIC", n:['plush toy','Nintendo Switch']},
+                {id:'H',t:"RESCUE", n:['my dog','radio','whistle']}
             ];
 
-            const s = scenarios[Math.floor(Math.random() * scenarios.length)];
+            const s = scens[Math.floor(Math.random()*scens.length)];
             currentScenarioId = s.id;
-            let isWin = s.need.some(n => items.includes(n));
-            let finalDesc = isWin ? s.ok : s.fail;
-            let isMiracle = false;
+            let win = s.n.some(n => items.includes(n));
+            let desc = win ? "You Survived! 🎉" : "Mission failed... 💀";
+            let miracle = false;
 
-            // --- 天選之子判斷 (排除三大救命物資) ---
-            const hasBig3 = items.includes('water bottle') || items.includes('medicine') || items.includes('flashlight');
-            
-            if (s.id === 'A' && items.includes('power bank') && items.includes('your phone')) {
-                isWin = true; finalDesc = "Your phone has full power! Use the flashlight and call for help! 📱🔋✨";
-                if (!hasBig3) isMiracle = true;
-            }
-            if (s.id === 'C' && items.includes('bubble tea')) { isWin = false; finalDesc = "Bubble tea makes you thirstier! 🤢"; }
-            if (s.id === 'E' && items.includes('sushi')) {
-                const safe = ['cookie', 'spaghetti', 'hamburger', 'canned food', 'chocolate'];
-                if (!safe.some(f => items.includes(f))) { isWin = false; finalDesc = "Sushi went bad! Stomachache! 🤢"; }
-            }
-            if (s.id === 'G' && items.includes('Nintendo Switch')) {
-                isWin = true; finalDesc = "Playing Nintendo Switch! You feel calm and happy! 🎮🎉";
-                if (!hasBig3) isMiracle = true;
-            }
+            if(s.id==='A' && items.includes('power bank') && items.includes('your phone')) win=true;
+            if(s.id==='C' && items.includes('bubble tea')) { win=false; desc="Bubble tea is too sweet! 🤢"; }
+            if(s.id==='G' && items.includes('Nintendo Switch')) win=true;
 
-            // 更新介面
-            const modalBox = document.getElementById('modal-box');
-            const miracleLabel = document.getElementById('miracle-title');
-            
-            modalBox.className = 'modal-content ' + (isWin ? 'result-success' : 'result-fail');
-            document.getElementById('scenario-label').textContent = "SCENARIO: " + s.title;
-            document.getElementById('result-icon').textContent = isWin ? "🌟" : "💀";
-            document.getElementById('result-title').textContent = isWin ? "SUCCESS!" : "FAILED...";
-            document.getElementById('result-desc').textContent = finalDesc;
-            
-            if (isMiracle && isWin) {
-                miracleLabel.style.display = 'block';
-                spawnConfetti();
-                playSound('win');
-            } else {
-                miracleLabel.style.display = 'none';
-                document.getElementById('confetti-container').style.display = 'none';
-                playSound(isWin ? 'win' : 'fail');
-            }
+            // 天選之子判斷
+            const big3 = ['water bottle','medicine','flashlight'];
+            if(win && !big3.some(b => items.includes(b))) miracle = true;
 
-            document.getElementById('revive-btn').style.display = isWin ? 'none' : 'block';
-            document.getElementById('quiz-container').style.display = 'none';
-            document.getElementById('result-desc').style.display = 'block';
             document.getElementById('result-modal').style.display = 'flex';
-        });
+            document.getElementById('scenario-label').textContent = s.t;
+            document.getElementById('result-icon').textContent = win ? "🌟" : "💀";
+            document.getElementById('result-title').textContent = win ? "SUCCESS" : "FAILED";
+            document.getElementById('result-desc').textContent = desc;
+            document.getElementById('miracle-title').style.display = miracle ? 'block' : 'none';
+            document.getElementById('revive-btn').style.display = win ? 'none' : 'block';
+            document.getElementById('quiz-area').style.display = 'none';
 
-        function startQuiz() {
+            if(miracle) spawnConfetti();
+        }
+
+        function startRevive() {
             document.getElementById('revive-btn').style.display = 'none';
-            document.getElementById('result-desc').style.display = 'none';
-            document.getElementById('quiz-container').style.display = 'block';
-            const qData = quizBank[currentScenarioId];
-            document.getElementById('quiz-q').textContent = qData.q;
-            qData.options.forEach((opt, i) => {
-                const btn = document.getElementById('opt' + i); btn.textContent = opt; btn.disabled = false; btn.className = 'opt-btn';
+            document.getElementById('quiz-area').style.display = 'block';
+            const q = quizBank[currentScenarioId];
+            document.getElementById('quiz-q').textContent = q.q;
+            const opts = document.getElementById('quiz-opts'); opts.innerHTML = '';
+            q.o.forEach((o, i) => {
+                const b = document.createElement('button');
+                b.className = 'opt-btn';
+                b.textContent = o;
+                b.onclick = () => {
+                    if(i === q.c) { showT("Correct! 🎉"); closeModal(); }
+                    else { b.style.background = 'red'; b.style.color = 'white'; b.disabled = true; }
+                };
+                opts.appendChild(b);
             });
         }
 
-        function checkAnswer(idx) {
-            const qData = quizBank[currentScenarioId];
-            document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
-            if (idx === qData.correct) {
-                document.getElementById('opt' + idx).classList.add('correct-ans');
-                setTimeout(() => {
-                    document.getElementById('modal-box').className = 'modal-content result-success';
-                    document.getElementById('result-icon').textContent = "🎉";
-                    document.getElementById('result-title').textContent = "REVIVED!";
-                    document.getElementById('quiz-container').style.display = 'none';
-                    document.getElementById('result-desc').style.display = 'block';
-                    document.getElementById('result-desc').textContent = "Revived! You are a survivor! 🎉";
-                    playSound('win');
-                }, 800);
-            } else {
-                document.getElementById('opt' + idx).classList.add('wrong-ans');
-                setTimeout(() => {
-                    document.getElementById('result-title').textContent = "GAME OVER";
-                    playSound('fail');
-                }, 800);
+        function closeModal(){ document.getElementById('result-modal').style.display='none'; }
+        
+        function resetGame() {
+            document.querySelectorAll('.basket .word-tag').forEach(t => {
+                document.getElementById('word-bank').appendChild(t);
+            });
+            selectedTag = null;
+        }
+
+        function spawnConfetti(){
+            const c = document.getElementById('confetti-container'); c.innerHTML='';
+            for(let i=0;i<50;i++){
+                const d = document.createElement('div'); d.className='confetti';
+                d.style.left=Math.random()*100+'vw'; d.style.backgroundColor='hsl('+Math.random()*360+',100%,50%)';
+                d.style.animationDuration=(Math.random()*2+2)+'s'; c.appendChild(d);
             }
         }
 
-        function closeModal() { document.getElementById('result-modal').style.display = 'none'; document.getElementById('confetti-container').style.display = 'none'; }
-        document.getElementById('reset-btn').addEventListener('click', () => { 
-            document.querySelectorAll('.basket .word-tag').forEach(t => document.getElementById('word-bank').appendChild(t)); 
-            playSound('drop'); 
-        });
         init();
     </script>
 </body>
