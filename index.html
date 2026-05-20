@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Survival Pack - The Ultimate Final Edition</title>
+    <title>My Survival Pack - Final Pro Edition</title>
     <style>
         :root {
             --primary-red: #d90429;
@@ -67,7 +67,7 @@
         #word-bank { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; pointer-events: none; }
 
         .word-tag {
-            background: white; border: 2px solid var(--dark-blue); padding: 10px 18px;
+            background: white; border: 2px solid var(--dark-blue); padding: 8px 16px;
             border-radius: 50px; cursor: pointer; font-size: 1.2rem; font-weight: bold;
             box-shadow: 3px 3px 0px rgba(0,0,0,0.1); transition: 0.2s; pointer-events: auto;
         }
@@ -78,20 +78,19 @@
         #check-btn { background: var(--primary-red); color: white; }
         #reset-btn { background: #94a3b8; color: white; }
 
-        /* 彈窗樣式 */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 10000; justify-content: center; align-items: center; padding: 15px; }
-        .modal-content { background: white; width: 100%; max-width: 650px; padding: 30px; border-radius: 30px; text-align: center; max-height: 95vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; }
+        .modal-content { background: white; width: 100%; max-width: 650px; padding: 30px; border-radius: 30px; text-align: center; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.6); position: relative; }
         
         .result-success { background-color: var(--success-bg); border: 12px solid var(--success-green); }
         .result-barely { background-color: var(--barely-bg); border: 12px solid var(--barely-orange); }
         .result-fail { background-color: var(--fail-bg); border: 12px solid var(--primary-red); }
 
-        .result-title { font-size: 2.8rem; margin: 10px 0; font-weight: 900; }
+        .result-title { font-size: 2.5rem; margin: 10px 0; font-weight: 900; }
         .result-desc { font-size: 1.5rem; font-weight: bold; line-height: 1.4; margin-bottom: 10px; }
         .key-item-box { display: inline-block; margin: 10px 0; padding: 10px 20px; background: rgba(0,0,0,0.05); border-radius: 10px; font-size: 1.3rem; color: var(--dark-blue); font-weight: 800; }
         
         #miracle-banner {
-            display: none; font-size: 2.2rem; font-weight: 900; margin-bottom: 20px;
+            display: none; font-size: 2rem; font-weight: 900; margin-bottom: 20px;
             background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: rainbow-anim 3s linear infinite;
@@ -99,7 +98,6 @@
         @keyframes rainbow-anim { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
         .opt-btn { width: 100%; margin: 8px 0; padding: 15px; border-radius: 12px; border: 3px solid var(--dark-blue); font-weight: bold; cursor: pointer; background: white; font-size: 1.2rem; transition: 0.2s; }
-        .opt-btn:hover { background: #eee; }
         #confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 11000; }
         .confetti { position: absolute; width: 10px; height: 10px; animation: fall linear forwards; }
         @keyframes fall { to { transform: translateY(110vh) rotate(360deg); opacity: 0; } }
@@ -142,19 +140,19 @@
     <div class="modal" id="result-modal">
         <div class="modal-content" id="modal-box">
             <div id="miracle-banner">🍀 MIRACLE! 天選之子大逆轉！</div>
-            <div id="scenario-label" style="font-size:1.1rem; color:#666; font-weight:bold; text-transform:uppercase;">SCENARIO</div>
-            <div id="result-icon" style="font-size:6rem;">✨</div>
+            <div id="scenario-label" style="font-size:1rem; color:#666; font-weight:bold; text-transform:uppercase;">SCENARIO</div>
+            <div id="result-icon" style="font-size:5rem;">✨</div>
             <h2 id="result-title">SURVIVED!</h2>
             <p id="result-desc"></p>
             <div id="key-item-display" class="key-item-box"></div>
             <div id="penalty-area" style="color:red; font-style:italic; margin-top:10px; font-weight:bold; font-size:1.1rem;"></div>
             
             <div id="quiz-area" style="display:none; text-align:left; background:#f5f5f5; padding:20px; border-radius:20px; margin:15px 0;">
-                <p id="quiz-q" style="font-weight:bold; font-size:1.4rem;"></p>
+                <p id="quiz-q" style="font-weight:bold; font-size:1.3rem;"></p>
                 <div id="quiz-opts" style="display:flex; flex-direction:column; gap:10px;"></div>
             </div>
 
-            <button id="revive-btn" class="btn" style="display:none; background:orange; color:white; width:100%; margin-top:10px;" onclick="showReviveQuiz()">🔥 Last Chance Revive</button>
+            <button id="revive-btn" class="btn" style="display:none; background:orange; color:white; width:100%; margin-top:10px;" onclick="showReviveQuiz()">🔥 Last Chance to Revive (英文挽救機會)</button>
             <button class="btn" id="close-btn" style="background:var(--dark-blue); color:white; width:100%; margin-top:15px; font-size:1.3rem;" onclick="closeModal()">Close</button>
         </div>
     </div>
@@ -162,16 +160,31 @@
     <script>
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
+        
+        // 勝利音效已改回 [523, 659, 783, 1046] 版本
         function playS(type) {
             try {
                 if (!audioCtx) audioCtx = new AudioContext();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
-                const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                osc.connect(gain); gain.connect(audioCtx.destination);
                 const now = audioCtx.currentTime;
-                if (type === 'pop') { osc.frequency.setValueAtTime(600, now); gain.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now + 0.1); }
-                else if (type === 'win') { [523, 659, 783, 1046].forEach((f, i) => { const o = audioCtx.createOscillator(); o.connect(audioCtx.destination); o.frequency.setValueAtTime(f, now + i * 0.1); o.start(now + i * 0.1); o.stop(now + i * 0.1 + 0.4); }); }
-                else if (type === 'fail') { osc.type = 'square'; osc.frequency.setValueAtTime(150, now); gain.gain.setValueAtTime(0.1, now); osc.start(); osc.stop(now + 0.5); }
+                if (type === 'pop') {
+                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                    o.connect(g); g.connect(audioCtx.destination);
+                    o.frequency.setValueAtTime(600, now); g.gain.setValueAtTime(0.1, now); o.start(); o.stop(now + 0.1);
+                } else if (type === 'win') {
+                    [523, 659, 783, 1046].forEach((f, i) => {
+                        const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                        o.connect(g); g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(f, now + i * 0.1);
+                        g.gain.setValueAtTime(0.05, now + i * 0.1);
+                        o.start(now + i * 0.1); o.stop(now + i * 0.1 + 0.4);
+                    });
+                } else if (type === 'fail') {
+                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                    o.connect(g); g.connect(audioCtx.destination);
+                    o.type = 'square'; o.frequency.setValueAtTime(150, now);
+                    g.gain.setValueAtTime(0.1, now); o.start(); o.stop(now + 0.5);
+                }
             } catch(e) {}
         }
 
@@ -191,7 +204,7 @@
             'B':{q:"Bleeding! What to treat wound?", o:["medicine","chocolate","tissue paper"], c:0},
             'C':{q:"Stores clean water?", o:["water bottle","mug","cola"], c:0},
             'D':{q:"Hungry! Energy food?", o:["spaghetti","ice","rock"], c:0},
-            'E':{q:"Escape! Best for running?", o:["shoes","manga","clock"], c:0},
+            'E':{q:"Dark Escape! Best for running?", o:["shoes","manga","clock"], c:0},
             'F':{q:"Panic! Emotional comfort?", o:["homework","plush toy","cash"], c:1},
             'G':{q:"Rescue! How to attract attention?", o:["whistle","selfie stick","id card"], c:0},
             'H':{q:"Cold! Warmest item?", o:["potted plant","sleeping bag","lipstick"], c:1}
@@ -236,33 +249,30 @@
             if(items.length === 0) { showToast("Bags are empty! 🎒"); return; }
 
             const scens = ["A", "B", "C", "D", "E", "F", "G", "H"];
-            const sId = scens[Math.floor(Math.random()*scens.length)];
-            currentScenarioId = sId;
-
-            let status = "fail"; let desc = ""; let scenarioTitle = ""; let keyItem = ""; let isMiracle = false;
-            let penaltyText = "";
+            currentScenarioId = scens[Math.floor(Math.random()*scens.length)];
+            let status = "fail"; let desc = ""; let scenarioTitle = ""; let keyItem = ""; let isMiracle = false; let penaltyText = "";
 
             const noTrad = !(["water bottle", "medicine", "flashlight", "lighter", "first-aid kit", "radio"].some(c => items.includes(c)));
             const otakuList = ["Nintendo Switch", "PS5", "video game", "chiikawa", "plush toy", "manga", "novel"];
 
-            switch(sId) {
+            switch(currentScenarioId) {
                 case "A": scenarioTitle = "Power Outage (停電)";
                     if(items.includes("flashlight")) { status="win"; keyItem="flashlight"; desc="Perfect! Flashlight saved you. 🔦"; }
-                    else if(items.includes("your phone") && items.includes("power bank")) { status="win"; keyItem="phone & power bank"; desc="Tech combination! 📱🔋"; }
+                    else if(items.includes("your phone") && items.includes("power bank")) { status="win"; keyItem="phone & power bank"; desc="Tech Combo! 📱🔋"; }
                     else if(["Apple watch", "laptop", "iPad mini", "lighter"].some(i => items.includes(i))) { 
                         status="barely"; keyItem=items.find(i=>["Apple watch", "laptop", "iPad mini", "lighter"].includes(i));
-                        desc="⚠️ BARELY SURVIVED! Weak light, but you made it! 🕯️🚶‍♂️";
-                    } else { status="fail"; desc="It's too dark... 🌑"; } break;
+                        desc="⚠️ BARELY SURVIVED! Weak light, but you made it out! 🕯️🚶‍♂️";
+                    } else { status="fail"; desc="Too dark to move... 🌑"; } break;
                 case "B": scenarioTitle = "Injured (受傷)";
-                    if(["medicine", "first-aid kit"].some(i => items.includes(i))) { status="win"; keyItem=items.find(i=>["medicine", "first-aid kit"].includes(i)); desc="Treated wounds! 🎉🩹"; }
+                    if(["medicine", "first-aid kit"].some(i => items.includes(i))) { status="win"; keyItem=items.find(i=>["medicine", "first-aid kit"].includes(i)); desc="Treated wounds successfully! 🎉🩹"; }
                     else if(["tissue paper", "towel", "mask", "glove", "t-shirt", "uniform", "lipstick"].some(i => items.includes(i))) { 
                         status="barely"; keyItem=items.find(i=>["tissue paper", "towel", "mask", "glove", "t-shirt", "uniform", "lipstick"].includes(i));
-                        desc="⚠️ BARELY SURVIVED! Used towels and clothes to stop bleeding. 🩸🩹";
-                    } else { status="fail"; desc="No supplies... 💀"; } break;
+                        desc="⚠️ BARELY SURVIVED! Used clothes to stop bleeding. Need a doctor! 🩸🩹";
+                    } else { status="fail"; desc="No supplies to stop the bleeding... 💀"; } break;
                 case "C": scenarioTitle = "Thirsty (缺水)";
-                    if(items.includes("water bottle") || items.includes("cola")) { status="win"; keyItem=items.includes("cola") ? "cola" : "water bottle"; desc="Hydrated! 💧🎉"; }
+                    if(items.includes("water bottle") || items.includes("cola")) { status="win"; keyItem=items.includes("cola") ? "cola" : "water bottle"; desc="Hydration is key! 💧🎉"; }
                     else if(["ice", "mug"].some(i => items.includes(i))) { 
-                        status="barely"; keyItem=items.find(i=>["ice", "mug"].includes(i)); desc="⚠️ BARELY SURVIVED! Still thirsty! 🌧️🥛";
+                        status="barely"; keyItem=items.find(i=>["ice", "mug"].includes(i)); desc="⚠️ BARELY SURVIVED! Melted ice or caught rain. 🌧️🥛";
                     } else if(items.includes("bubble tea")) { status="fail"; desc="Bubble tea made you even thirstier! 🥤🤢"; }
                     else { status="fail"; desc="Dehydration... 🏜️"; } break;
                 case "D": scenarioTitle = "Hunger (飢餓)";
@@ -276,25 +286,21 @@
                     let o = otakuList.find(i => items.includes(i)) || items.find(i => i === "your photo");
                     if(o) { 
                         status="win"; keyItem=o; desc="Hobbies kept you calm! 🎮"; 
-                        if(noTrad && otakuList.includes(o)) { 
-                            isMiracle = true; 
-                            desc = "🍀 MIRACLE! You have no water or light, but Chiikawa and Manga saved your spirit! 🥰📚"; 
-                        }
+                        if(noTrad && otakuList.includes(o)) { isMiracle = true; desc = "🍀 MIRACLE! No water or light, but Chiikawa and Manga saved your spirit! 🥰📚"; }
                     } else { status="fail"; desc="Panic attack... 😭"; } break;
                 case "G": scenarioTitle = "Rescue (救援)";
                     let res = ["my dog", "whistle", "radio"].find(i => items.includes(i));
                     if(res) { 
                         status="win"; keyItem=res; desc="Heard by rescuers! 🐶📣"; 
-                        if(noTrad) { isMiracle = true; desc = "🍀 MIRACLE! Your noise maker saved you! 🐶📢"; }
+                        if(noTrad) { isMiracle = true; desc = "🍀 MIRACLE! Your noise maker saved you in 5 minutes! 🐶📢"; }
                     } else if(items.includes("your phone") && items.includes("power bank") && items.includes("Wi-Fi router")) {
-                        status="win"; keyItem="Wi-Fi combo"; 
-                        if(noTrad) { isMiracle = true; desc = "🍀 MIRACLE! Tweeted location! 📱🌐✨"; }
+                        status="win"; keyItem="Wi-Fi combo"; if(noTrad) { isMiracle = true; desc = "🍀 MIRACLE! You tweeted your location! Instant rescue! 📱🌐✨"; }
                     } else { status="fail"; desc="Not found... 🤫"; } break;
                 case "H": scenarioTitle = "Cold Wave (寒流)";
                     if(items.includes("sleeping bag")) { status="win"; keyItem="sleeping bag"; desc="Cozy and warm! 🛌🌟"; }
                     else if(["coat", "raincoat", "camp", "glove", "t-shirt"].some(i => items.includes(i))) { 
                         status="barely"; keyItem=items.find(i=>["coat", "raincoat", "camp", "glove", "t-shirt"].includes(i));
-                        desc="⚠️ BARELY SURVIVED! Shivering but alive. 🥶🧥";
+                        desc="⚠️ BARELY SURVIVED! Layering saved your life. 🥶🧥";
                     } else { status="fail"; desc="Frozen solid... ❌❄️"; } break;
             }
 
@@ -310,35 +316,36 @@
                 if(spoiled) penaltyText += `Stomachache from ${spoiled}! 🤢`;
             }
 
-            const box = document.getElementById('modal-box');
-            document.getElementById('miracle-banner').style.display = isMiracle ? 'block' : 'none';
-            document.getElementById('result-title').textContent = isMiracle ? "🍀 MIRACLE! 🍀" : (status === "win" ? "SURVIVED! 🎉" : (status === "barely" ? "⚠️ BARELY SURVIVED!" : "GAME OVER... 💀"));
-            box.className = 'modal-content ' + (status === "win" || isMiracle ? 'result-success' : (status === "barely" ? 'result-barely' : 'result-fail'));
-            document.getElementById('result-icon').textContent = isMiracle ? "🍀" : (status === "win" ? "🌟" : (status === "barely" ? "🚶‍♂️" : "💀"));
+            const box = document.getElementById('modal-box'); const banner = document.getElementById('miracle-banner');
+            const titleEl = document.getElementById('result-title'); const iconEl = document.getElementById('result-icon');
+            const keyEl = document.getElementById('key-item-display');
+
+            if(isMiracle) { banner.style.display='block'; titleEl.textContent="🍀 MIRACLE! 🍀"; iconEl.textContent="🍀"; box.className='modal-content result-success'; spawnConfetti(); playS('win'); }
+            else if(status==="win") { banner.style.display='none'; titleEl.textContent="SURVIVED! 🎉"; iconEl.textContent="🌟"; box.className='modal-content result-success'; playS('win'); }
+            else if(status==="barely") { banner.style.display='none'; titleEl.textContent="⚠️ BARELY SURVIVED!"; iconEl.textContent="🚶‍♂️"; box.className='modal-content result-barely'; playS('win'); }
+            else { banner.style.display='none'; titleEl.textContent="GAME OVER... 💀"; iconEl.textContent="💀"; box.className='modal-content result-fail'; playS('fail'); }
+
             document.getElementById('scenario-label').textContent = "SCENARIO: " + scenarioTitle;
             document.getElementById('result-desc').textContent = desc;
-            document.getElementById('key-item-display').textContent = keyItem ? `Because you chose "${keyItem}"!` : "";
             document.getElementById('penalty-area').textContent = penaltyText;
+            keyEl.textContent = keyItem ? `Because you chose "${keyItem}"!` : "";
             document.getElementById('result-modal').style.display = 'flex';
-            
             document.getElementById('revive-btn').style.display = (status === "fail") ? 'block' : 'none';
             document.getElementById('quiz-area').style.display = 'none';
-            
-            if(isMiracle) spawnConfetti();
-            playS(status === "fail" ? 'fail' : 'win');
         }
 
         function showReviveQuiz() {
             document.getElementById('revive-btn').style.display = 'none';
             document.getElementById('quiz-area').style.display = 'block';
-            const qD = quizBank[currentScenarioId];
-            document.getElementById('quiz-q').textContent = qD.q;
+            const q = quizBank[currentScenarioId];
+            document.getElementById('quiz-q').textContent = q.q;
             const opts = document.getElementById('quiz-opts'); opts.innerHTML = '';
-            qD.o.forEach((o, i) => {
+            q.o.forEach((o, i) => {
                 const b = document.createElement('button'); b.className = 'opt-btn'; b.textContent = o;
                 b.onclick = () => {
-                    if(i === qD.c) { closeModal(); showToast("REVIVED! 🎉"); playS('win'); }
-                    else { b.style.background = 'red'; b.style.color='white'; b.disabled = true; }
+                    document.querySelectorAll('.opt-btn').forEach(bb=>bb.disabled=true);
+                    if(i === q.c) { closeModal(); showToast("REVIVED! 🎉"); playS('win'); }
+                    else { b.style.background = 'red'; b.style.color='white'; }
                 };
                 opts.appendChild(b);
             });
@@ -354,12 +361,8 @@
         }
 
         function closeModal() { document.getElementById('result-modal').style.display='none'; }
-        function resetGame() {
-            document.querySelectorAll('.basket .word-tag').forEach(t => document.getElementById('word-bank').appendChild(t));
-            selectedTag = null; updateUI(false); playS('pop');
-        }
-
-        document.addEventListener('DOMContentLoaded', init);
+        function resetGame() { document.querySelectorAll('.basket .word-tag').forEach(t => document.getElementById('word-bank').appendChild(t)); selectedTag = null; updateUI(false); playS('pop'); }
+        init();
     </script>
 </body>
 </html>
